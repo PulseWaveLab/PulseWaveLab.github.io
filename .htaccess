@@ -1,0 +1,29 @@
+# ═══ PULSEWAVELAB · CABECERAS DE SEGURIDAD (Apache) ═══
+# Subir este archivo a la raíz del hosting junto con index.html
+
+<IfModule mod_headers.c>
+# Anti-clickjacking a nivel servidor
+Header always set X-Frame-Options "SAMEORIGIN"
+# Evita sniffing de MIME types
+Header always set X-Content-Type-Options "nosniff"
+# No filtrar rutas internas al navegar hacia otros sitios
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+# Desactiva APIs sensibles del navegador
+Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+# HSTS: forzar HTTPS durante 1 año (activa solo con certificado SSL instalado)
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+# CSP espejo de la del <meta>. Para endurecerla a futuro: quitar 'unsafe-inline'
+# y mover el script inline a un archivo .js externo con su hash nonce.
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; child-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'"
+</IfModule>
+
+# No listar directorios
+Options -Indexes
+
+# Bloquear acceso a archivos que nunca deben servirse
+<FilesMatch "\.(env|log|bak|part|md|txt|json|yml|yaml|sql)$">
+Require all denied
+</FilesMatch>
+
+# Deshabilitar la firma del servidor (no revelar versión de Apache)
+ServerSignature Off
